@@ -13,6 +13,11 @@ Downloads and the source repository can be found on GitHub:
 
   http://github.com/rosejn/midi-clj
 
+Eventually there will be more documentation for this library, but in the
+meantime you can see it in use within the context of Project Overtone, located
+here:
+
+  http://github.com/rosejn/overtone
 
 #### Mailing List
 
