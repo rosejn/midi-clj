@@ -15,6 +15,16 @@
      (java.util.concurrent FutureTask))
   (:use clojure.set))
 
+(def *midi-player-pool* (ScheduledThreadPoolExecutor. NUM-PLAYER-THREADS))
+
+(defn- now []
+  (System/currentTimeMillis))
+
+(defn- schedule 
+  "Schedules fun to be executed after ms-delay milliseconds."
+  [fun ms-delay]
+  (.schedule *midi-player-pool* fun (long ms-delay) TimeUnit/MILLISECONDS))
+
 ;(defn byte-array [len]
 ;  (make-array (. Byte TYPE) len))
 
@@ -118,7 +128,8 @@
     (assoc source-info :transmitter (.getTransmitter dev))))
 
 (defn midi-in 
-  "Connect the sequencer to a midi input device."
+  "Connect the sequencer to a midi input device.  If no argument is given then
+  a selection list pops up to let you browse and select the midi device."
   ([] (with-transmitter
         (.get (midi-port-chooser "Midi Input Selector" (midi-sources)))))
   ([in] 
@@ -132,7 +143,8 @@
          nil)))))
 
 (defn midi-out 
-  "Connect the sequencer to a midi output device."
+  "Connect the sequencer to a midi output device.  If no argument is given then
+  a selection list pops up to let you browse and select the midi device."
   ([] (with-receiver 
         (.get (midi-port-chooser "Midi Output Selector" (midi-sinks)))))
 
@@ -181,7 +193,7 @@
 
 (defn midi-note-off 
   "Send a midi off msg to the sink."
-  [sink note-num vel]
+  [sink note-num]
   (let [off-msg (ShortMessage.)]
     (.setMessage off-msg ShortMessage/NOTE_OFF 0 note-num 0)
     (.send (:receiver sink) off-msg -1)))
@@ -202,21 +214,21 @@
     (.setMessage sys-msg bytes (count bytes))
     (.send (:receiver sink) sys-msg -1)))
 
-;(defn midi-note 
-;  "Send a midi on/off msg pair to the sink."
-;  [sink note-num vel dur]
-;  (midi-note-on sink note-num vel)
-;  (schedule #(midi-note-off sink note-num 0) dur))
-;
-;(defn midi-play [out notes velocities durations]
-;  (loop [notes notes
-;         velocities velocities
-;         durations durations
-;         cur-time  0]
-;    (if notes
-;      (let [n (first notes)
-;            v (first velocities)
-;            d (first durations)]
-;        (schedule #(midi-note out n v d) cur-time)
-;        (recur (next notes) (next velocities) (next durations) (+ cur-time d))))))
-;
+(defn midi-note 
+  "Send a midi on/off msg pair to the sink."
+  [sink note-num vel dur]
+  (midi-note-on sink note-num vel)
+  (schedule #(midi-note-off sink note-num 0) dur))
+
+(defn midi-play [out notes velocities durations]
+  (loop [notes notes
+         velocities velocities
+         durations durations
+         cur-time  0]
+    (if notes
+      (let [n (first notes)
+            v (first velocities)
+            d (first durations)]
+        (schedule #(midi-note out n v d) cur-time)
+        (recur (next notes) (next velocities) (next durations) (+ cur-time d))))))
+
