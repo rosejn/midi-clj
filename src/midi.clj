@@ -25,9 +25,6 @@
   [fun ms-delay]
   (.schedule *midi-player-pool* fun (long ms-delay) TimeUnit/MILLISECONDS))
 
-;(defn byte-array [len]
-;  (make-array (. Byte TYPE) len))
-
 (defn midi-devices []
   "Get all of the currently available midi devices."
   (for [info (MidiSystem/getMidiDeviceInfo)]
@@ -220,7 +217,9 @@
   (midi-note-on sink note-num vel)
   (schedule #(midi-note-off sink note-num 0) dur))
 
-(defn midi-play [out notes velocities durations]
+(defn midi-play 
+  "Play a seq of notes with the corresponding velocities and durations."
+  [out notes velocities durations]
   (loop [notes notes
          velocities velocities
          durations durations
