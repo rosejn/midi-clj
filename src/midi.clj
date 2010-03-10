@@ -12,9 +12,10 @@
      (javax.swing JFrame JScrollPane JList 
                   DefaultListModel ListSelectionModel)
      (java.awt.event MouseAdapter)
-     (java.util.concurrent FutureTask))
+     (java.util.concurrent FutureTask ScheduledThreadPoolExecutor TimeUnit))
   (:use clojure.set))
 
+(def NUM-PLAYER-THREADS 10)
 (def *midi-player-pool* (ScheduledThreadPoolExecutor. NUM-PLAYER-THREADS))
 
 (defn- now []
