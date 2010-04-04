@@ -39,6 +39,10 @@ ports.  USB midi devices should be pretty much plug and play.
 
 ### Project Info:
 
+Include in your project.clj like so:
+
+  [overtone/midi-clj "0.1"]
+
 #### Source Repository
 Downloads and the source repository can be found on GitHub:
 

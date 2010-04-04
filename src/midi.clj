@@ -126,7 +126,7 @@
     (assoc source-info :transmitter (.getTransmitter dev))))
 
 (defn midi-in 
-  "Connect the sequencer to a midi input device.  If no argument is given then
+  "Open a midi input device for reading.  If no argument is given then
   a selection list pops up to let you browse and select the midi device."
   ([] (with-transmitter
         (.get (midi-port-chooser "Midi Input Selector" (midi-sources)))))
@@ -141,7 +141,7 @@
          nil)))))
 
 (defn midi-out 
-  "Connect the sequencer to a midi output device.  If no argument is given then
+  "Open a midi output device for writing.  If no argument is given then
   a selection list pops up to let you browse and select the midi device."
   ([] (with-receiver 
         (.get (midi-port-chooser "Midi Output Selector" (midi-sinks)))))
@@ -160,6 +160,32 @@
   returned from midi-in and midi-out."
   [source sink]
   (.setReceiver (:transmitter source) (:receiver sink)))
+
+(def midi-shortmessage-status 
+  {ShortMessage/ACTIVE_SENSING :active-sensing
+   ShortMessage/CONTINUE :continue
+   ShortMessage/END_OF_EXCLUSIVE :end-of-exclusive
+   ShortMessage/MIDI_TIME_CODE :midi-time-code
+   ShortMessage/SONG_POSITION_POINTER :song-position-pointer
+   ShortMessage/SONG_SELECT :song-select
+   ShortMessage/START :start
+   ShortMessage/STOP :stop
+   ShortMessage/SYSTEM_RESET :system-reset
+   ShortMessage/TIMING_CLOCK :timing-clock
+   ShortMessage/TUNE_REQUEST :tune-request})
+
+(def midi-sysexmessage-status 
+  {SysexMessage/SYSTEM_EXCLUSIVE :system-exclusive
+   SysexMessage/SPECIAL_SYSTEM_EXCLUSIVE :special-system-exclusive})
+
+(def midi-shortmessage-command 
+  {ShortMessage/CHANNEL_PRESSURE :channel-pressure
+   ShortMessage/CONTROL_CHANGE :control-change
+   ShortMessage/NOTE_OFF :note-off
+   ShortMessage/NOTE_ON :note-on
+   ShortMessage/PITCH_BEND :pitch-bend
+   ShortMessage/POLY_PRESSURE :poly-pressure
+   ShortMessage/PROGRAM_CHANGE :program-change})
 
 (defn midi-msg 
   "Make a clojure map out of a midi object."
